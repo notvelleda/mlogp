@@ -533,7 +533,7 @@ pub fn create_instructions() -> Vec<Box<dyn InstructionCompiler>> {
             super_instruction_name: None,
         }),
 
-        // jump  addr: label, comp: Comp, a: any, b: any
+        // jump  addr: label, comp: Comp, a: any, <b: any>
         // jump  addr: label, always
         Box::new(InstructionJump {}),
 
@@ -543,7 +543,7 @@ pub fn create_instructions() -> Vec<Box<dyn InstructionCompiler>> {
         // gosub  addr: routine
         Box::new(InstructionGosub {}),
 
-        // op
+        // op  op: op, result: variable, a: any, <b: any>
         Box::new(InstructionOp {}),
     ]
 }

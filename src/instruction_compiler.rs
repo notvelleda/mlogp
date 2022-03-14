@@ -237,8 +237,8 @@ impl InstructionCompiler for InstructionGosub {
         Token::InstGosub
     }
 
-    fn compile(&self, lex: &mut Lexer<Token>, _variables: &[String], _labels: &HashMap<String, u32>, routines: &HashMap<String, u32>, filename: &str, line: u32, debug: bool, _current_routine: &Option<String>, num_instructions: usize) -> Vec<String> {
-        let label_name = match lex.next() {
+    fn compile(&self, lex: &mut Lexer<Token>, _variables: &[String], _labels: &HashMap<String, u32>, routines: &HashMap<String, u32>, filename: &str, line: u32, debug: bool, current_routine: &Option<String>, num_instructions: usize) -> Vec<String> {
+        let routine_name = match lex.next() {
             Some(Token::Name(label)) => label,
             err => {
                 error(&format!("expected routine, got {:?}", err), filename, line);
@@ -247,18 +247,25 @@ impl InstructionCompiler for InstructionGosub {
             }
         };
 
+        if let Some(current) = current_routine {
+            if &routine_name == current {
+                error("can't call the current subroutine!", filename, line);
+                std::process::exit(1);
+            }
+        }
+
         let mut elements = vec!["jump".to_string()];
-        if let Some(pos) = routines.get(&label_name) {
+        if let Some(pos) = routines.get(&routine_name) {
             elements.push(format!("{}", pos));
         } else {
-            error(&format!("couldn't find routine {}", label_name), filename, line);
+            error(&format!("couldn't find routine {}", routine_name), filename, line);
             std::process::exit(1);
         }
         elements.push("always".to_string());
         if debug {
-            elements.push(format!("# gosub {}", label_name));
+            elements.push(format!("# gosub {}", routine_name));
         }
 
-        vec![format!("set {}Return {}", label_name, num_instructions + 2), elements.join(" ")]
+        vec![format!("set {}Return {}", routine_name, num_instructions + 2), elements.join(" ")]
     }
 }
