@@ -49,6 +49,7 @@ pub fn main() {
     while let Some(token) = lex.next() {
         //println!("pass 1 {:?}", token);
         let mut skip_to_next = true;
+        let slice = lex.slice();
         match token {
             Token::InstWrite | Token::InstDraw | Token::InstDrawFlush | 
             Token::InstPrint | Token::InstPrintFlush | Token::InstControl |
@@ -70,8 +71,8 @@ pub fn main() {
                         }
                     },
                     Some(Token::SysVar(_)) => (),
-                    Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                    None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                    Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                    None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                 }
             },
 
@@ -87,8 +88,8 @@ pub fn main() {
                         }
                     },
                     Some(Token::SysVar(_)) => (),
-                    Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                    None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                    Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                    None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                 }
             },
 
@@ -106,8 +107,8 @@ pub fn main() {
                         }
                     },
                     Some(Token::SysVar(_)) => (),
-                    Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                    None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                    Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                    None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                 }
             },
 
@@ -128,8 +129,8 @@ pub fn main() {
                                     }
                                 },
                                 Some(Token::SysVar(_)) => (),
-                                Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                                None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                                Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                                None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                             }
                         }
                     },
@@ -145,8 +146,8 @@ pub fn main() {
                                 }
                             },
                             Some(Token::SysVar(_)) => (),
-                            Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                            None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                            Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                            None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                         }
                     },
                     _ => (),
@@ -168,8 +169,8 @@ pub fn main() {
                                     }
                                 },
                                 Some(Token::SysVar(_)) => (),
-                                Some(unx) => error(&format!("unexpected token {:?} after {:?}", unx, token), &args.input, line_count),
-                                None => error(&format!("unexpected EOF after {:?}", token), &args.input, line_count),
+                                Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                                None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                             }
                         }
                     },
@@ -186,7 +187,8 @@ pub fn main() {
                                     }
                                 },
                                 Some(Token::SysVar(_)) => (),
-                                _ => error(&format!("unexpected token after {:?}", token), &args.input, line_count),
+                                Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                                None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                             }
                         }
                     },
@@ -201,7 +203,8 @@ pub fn main() {
                                     }
                                 },
                                 Some(Token::SysVar(_)) => (),
-                                _ => error(&format!("unexpected token after {:?}", token), &args.input, line_count),
+                                Some(_) => { error(&format!("unexpected token {} after {}", lex.slice(), slice), &args.input, line_count); std::process::exit(1); },
+                                None => { error(&format!("unexpected EOF after {}", slice), &args.input, line_count); std::process::exit(1); },
                             }
                         }
                     },
@@ -215,7 +218,7 @@ pub fn main() {
 
             Token::InstEndRoutine => (),
 
-            _ => error(&format!("unexpected token {:?}", token), &args.input, line_count),
+            _ => { error(&format!("unexpected token {}", slice), &args.input, line_count); std::process::exit(1); },
         }
         if skip_to_next {
             loop {

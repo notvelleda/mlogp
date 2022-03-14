@@ -21,13 +21,13 @@ impl Value {
         match &next {
             None => {
                 if !allow_none {
-                    error_no_line(&format!("expected {:?} or variable, got EOF", self), filename)
+                    error_no_line(&format!("expected {} or variable, got EOF", self.to_string()), filename)
                 }
                 None
             },
             Some(Token::Newline) => {
                 if !allow_none {
-                    error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line)
+                    error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line)
                 }
                 None
             },
@@ -35,7 +35,7 @@ impl Value {
                 match self {
                     Value::Bool(_) | Value::Any(_) => Some(val.to_string()),
                     _ => {
-                        error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                        error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                         None
                     },
                 }
@@ -44,7 +44,7 @@ impl Value {
                 match self {
                     Value::Float(_) | Value::Any(_) => Some(val.to_string()),
                     _ => {
-                        error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                        error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                         None
                     },
                 }
@@ -53,7 +53,7 @@ impl Value {
                 match self {
                     Value::Int(_) | Value::Any(_) => Some(val.to_string()),
                     _ => {
-                        error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                        error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                         None
                     },
                 }
@@ -62,7 +62,7 @@ impl Value {
                 match self {
                     Value::String(_) | Value::Any(_) => Some(val.to_string()),
                     _ => {
-                        error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                        error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                         None
                     },
                 }
@@ -74,7 +74,7 @@ impl Value {
                     match self {
                         Value::Name(_, _) | Value::Any(_) => Some(val.to_string()),
                         _ => {
-                            error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                            error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                             None
                         },
                     }
@@ -82,7 +82,7 @@ impl Value {
             },
             Some(Token::SysVar(val)) => Some(val.to_string()),
             _ => {
-                error(&format!("expected {} or variable, got {:?} (maybe you forgot to create a variable?)", self.to_string(), next.unwrap()), filename, line);
+                error(&format!("expected {} or variable, got {} (maybe you forgot to create a variable?)", self.to_string(), lex.slice()), filename, line);
                 None
             },
         }

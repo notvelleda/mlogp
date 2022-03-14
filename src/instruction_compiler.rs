@@ -71,7 +71,7 @@ impl InstructionCompiler for InstructionGroup {
         let mut elements = vec![self.name.to_string()];
         let next = lex.next();
         match next {
-            Some(Token::Newline) => error(&format!("unexpected newline after instruction \"{}\"", self.name), filename, line),
+            Some(Token::Newline) => { error(&format!("unexpected newline after instruction \"{}\"", self.name), filename, line); std::process::exit(1); },
             Some(token) => {
                 let mut has_inst = false;
                 for inst in self.sub_instructions.iter() {
@@ -82,10 +82,11 @@ impl InstructionCompiler for InstructionGroup {
                     }
                 }
                 if !has_inst {
-                    error(&format!("unknown sub-instruction {:?} for \"{}\"", token, self.name), filename, line);
+                    error(&format!("unknown sub-instruction {} for \"{}\"", lex.slice(), self.name), filename, line);
+                    std::process::exit(1);
                 }
             },
-            None => error("expected sub-instruction name, got EOF", filename, line),
+            None => { error("expected sub-instruction name, got EOF", filename, line); std::process::exit(1); },
         }
         vec![elements.join(" ")]
     }
@@ -111,12 +112,12 @@ impl InstructionCompiler for InstructionJump {
                     elements.push(format!("{}", pos));
                     label
                 } else {
-                    error(&format!("couldn't find label {:?}", label), filename, line);
+                    error(&format!("couldn't find label {}", label), filename, line);
                     std::process::exit(1);
                 }
             },
-            err => {
-                error(&format!("expected label, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected label, got {}", lex.slice()), filename, line);
                 print_def();
                 std::process::exit(1);
             }
@@ -138,8 +139,8 @@ impl InstructionCompiler for InstructionJump {
                 }
             },
             Some(Token::Always) => elements.push("always".to_string()),
-            err => {
-                error(&format!("expected comparison, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected comparison, got {}", lex.slice()), filename, line);
                 print_def();
                 std::process::exit(1);
             }
@@ -177,8 +178,8 @@ impl InstructionCompiler for InstructionGoto {
                     std::process::exit(1);
                 }
             },
-            err => {
-                error(&format!("expected label, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected label, got {}", lex.slice()), filename, line);
                 println!("{} instruction is defined as: goto label (label)", "note:".bold());
                 std::process::exit(1);
             }
@@ -203,8 +204,8 @@ impl InstructionCompiler for InstructionOp {
         let mut elements = vec!["op".to_string()];
         match lex.next() {
             Some(Token::Op(op)) => elements.push(op),
-            err => {
-                error(&format!("expected op, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected op, got {}", lex.slice()), filename, line);
                 print_def();
                 std::process::exit(1);
             }
@@ -242,8 +243,8 @@ impl InstructionCompiler for InstructionGosub {
     fn compile(&self, lex: &mut Lexer<Token>, _variables: &[String], _labels: &HashMap<String, u32>, routines: &HashMap<String, u32>, filename: &str, line: u32, debug: bool, current_routine: &Option<String>, num_instructions: usize) -> Vec<String> {
         let routine_name = match lex.next() {
             Some(Token::Name(label)) => label,
-            err => {
-                error(&format!("expected routine, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected routine, got {}", lex.slice()), filename, line);
                 println!("{} instruction is defined as: gosub routine (routine)", "note:".bold());
                 std::process::exit(1);
             }
@@ -287,8 +288,8 @@ impl InstructionCompiler for InstructionGosubCond {
         
         let routine_name = match lex.next() {
             Some(Token::Name(label)) => label,
-            err => {
-                error(&format!("expected routine, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected routine, got {}", lex.slice()), filename, line);
                 print_def();
                 std::process::exit(1);
             }
@@ -326,8 +327,8 @@ impl InstructionCompiler for InstructionGosubCond {
                 }
             },
             Some(Token::Always) => elements.push("always".to_string()),
-            err => {
-                error(&format!("expected comparison, got {:?}", err), filename, line);
+            _ => {
+                error(&format!("expected comparison, got {}", lex.slice()), filename, line);
                 print_def();
                 std::process::exit(1);
             }
