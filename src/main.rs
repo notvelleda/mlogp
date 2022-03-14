@@ -263,9 +263,8 @@ pub fn main() {
                     if token == inst.get_token() {
                         code.append(&mut inst.compile(&mut lex, &variables, &labels, &routines, &args.input, line_count, args.debugcomments, &current_subroutine, code.len()));
                         if let Some(name) = &label_debug_name {
-                            let string = code.pop().unwrap();
-
                             if args.debugcomments {
+                                let string = code.pop().unwrap();
                                 code.push(format!("{} # {}", string, name));
                             }
                             
