@@ -56,7 +56,7 @@ pub fn main() {
             Token::InstUnitRadar | Token::InstNoOp | Token::InstGoto |
             Token::InstReturn => inst_counter += 1, // emits one instruction
 
-            Token::InstGosub => inst_counter += 2, // emits two instructions
+            Token::InstGosub | Token::InstGosubCond => inst_counter += 2, // emits two instructions
 
             Token::InstRead | Token::InstGetLink | Token::InstSensor |
             Token::InstSet => {
@@ -212,6 +212,9 @@ pub fn main() {
             Token::Label(name) => { labels.insert(name, inst_counter); },
             Token::Subroutine(name) => { routines.insert(name, inst_counter); },
             Token::Newline => { skip_to_next = false; line_count += 1; },
+
+            Token::InstEndRoutine => (),
+
             _ => error(&format!("unexpected token {:?}", token), &args.input, line_count),
         }
         if skip_to_next {
@@ -254,8 +257,8 @@ pub fn main() {
                     error("can't return outside of a subroutine!", &args.input, line_count);
                     std::process::exit(1);
                 }
-                current_subroutine = None;
             },
+            Token::InstEndRoutine => current_subroutine = None,
             Token::Newline => line_count += 1,
             _ => {
                 let mut found_inst = false;

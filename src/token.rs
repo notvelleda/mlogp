@@ -225,8 +225,14 @@ pub enum Token {
     #[regex("gosub")]
     InstGosub,
 
+    #[regex("gosubc")]
+    InstGosubCond,
+
     #[regex("return")]
     InstReturn,
+
+    #[token("endroutine")]
+    InstEndRoutine,
 
     #[regex("[a-zA-Z0-9]+", |lex| lex.slice().parse())]
     Name(String),

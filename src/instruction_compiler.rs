@@ -127,11 +127,13 @@ impl InstructionCompiler for InstructionJump {
                 if let Some(compiled) = Value::Any("a".to_string()).compile(lex, variables, false, filename, line) {
                     elements.push(compiled);
                 } else {
+                    print_def();
                     std::process::exit(1);
                 }
                 if let Some(compiled) = Value::Any("b".to_string()).compile(lex, variables, true, filename, line) {
                     elements.push(compiled);
                 } else {
+                    print_def();
                     std::process::exit(1);
                 }
             },
@@ -262,6 +264,75 @@ impl InstructionCompiler for InstructionGosub {
             std::process::exit(1);
         }
         elements.push("always".to_string());
+        if debug {
+            elements.push(format!("# gosub {}", routine_name));
+        }
+
+        vec![format!("set {}Return {}", routine_name, num_instructions + 2), elements.join(" ")]
+    }
+}
+
+pub struct InstructionGosubCond {}
+
+impl InstructionCompiler for InstructionGosubCond {
+    fn get_token(&self) -> Token {
+        Token::InstGosubCond
+    }
+
+    fn compile(&self, lex: &mut Lexer<Token>, variables: &[String], _labels: &HashMap<String, u32>, routines: &HashMap<String, u32>, filename: &str, line: u32, debug: bool, current_routine: &Option<String>, num_instructions: usize) -> Vec<String> {
+        fn print_def() {
+            println!("{} instruction is defined as: gosubc label (label) comp (Comp) a (any) b (any)", "note:".bold());
+            println!("or: gosubc label (label) always");
+        }
+        
+        let routine_name = match lex.next() {
+            Some(Token::Name(label)) => label,
+            err => {
+                error(&format!("expected routine, got {:?}", err), filename, line);
+                print_def();
+                std::process::exit(1);
+            }
+        };
+
+        if let Some(current) = current_routine {
+            if &routine_name == current {
+                error("can't call the current subroutine!", filename, line);
+                std::process::exit(1);
+            }
+        }
+
+        let mut elements = vec!["jump".to_string()];
+        if let Some(pos) = routines.get(&routine_name) {
+            elements.push(format!("{}", pos));
+        } else {
+            error(&format!("couldn't find routine {}", routine_name), filename, line);
+            std::process::exit(1);
+        }
+        
+        match lex.next() {
+            Some(Token::Op(comp)) => {
+                elements.push(comp);
+                if let Some(compiled) = Value::Any("a".to_string()).compile(lex, variables, false, filename, line) {
+                    elements.push(compiled);
+                } else {
+                    print_def();
+                    std::process::exit(1);
+                }
+                if let Some(compiled) = Value::Any("b".to_string()).compile(lex, variables, true, filename, line) {
+                    elements.push(compiled);
+                } else {
+                    print_def();
+                    std::process::exit(1);
+                }
+            },
+            Some(Token::Always) => elements.push("always".to_string()),
+            err => {
+                error(&format!("expected comparison, got {:?}", err), filename, line);
+                print_def();
+                std::process::exit(1);
+            }
+        }
+
         if debug {
             elements.push(format!("# gosub {}", routine_name));
         }

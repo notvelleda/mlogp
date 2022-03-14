@@ -202,7 +202,8 @@ pub fn create_instructions() -> Vec<Box<dyn InstructionCompiler>> {
                     name: "enabled".to_string(),
                     token: Token::SubInstEnabled,
                     arguments: vec![
-                        Value::Name("target".to_string(), "Building".to_string())
+                        Value::Name("target".to_string(), "Building".to_string()),
+                        Value::Bool("enabled".to_string())
                     ],
                     super_instruction_name: Some("control".to_string()),
                 },
@@ -542,6 +543,10 @@ pub fn create_instructions() -> Vec<Box<dyn InstructionCompiler>> {
 
         // gosub  addr: routine
         Box::new(InstructionGosub {}),
+        
+        // gosubcond  addr: routine, comp: Comp, a: any, <b: any>
+        // gosubcond  addr: routine, always
+        Box::new(InstructionGosubCond {}),
 
         // op  op: op, result: variable, a: any, <b: any>
         Box::new(InstructionOp {}),
