@@ -15,4 +15,5 @@ download the code from the [latest release](https://github.com/notvelleda/mlogp/
 - instead of taking addresses to jump to, the `jump` instruction now takes labels, and will jump to them accordingly
 - the instruction `goto <labelName>` is an alias to `jump <labelName> always`, if you want to type slightly less
 - basic subroutine support, uses variables to store the instruction pointer locations since we don't have a stack. downsides are recursion doesn't work. it's possible to create a stack, but it would be slow so i didn't
-- you can create subroutines with `routine <routineName>:`, return from a subroutine with `return`, and call a subroutine with `gosub <routineName>`
+- you can create subroutines with `routine <routineName>:`, return from a subroutine with `return`, and end a subroutine with `endroutine`
+- subroutines are called with `gosub <routineName>` or you can use `gosubc` for a conditional gosub, syntax is the same as `jump`
